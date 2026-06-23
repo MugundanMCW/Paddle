@@ -26,6 +26,20 @@
 
 generate_dummy_static_lib(LIB_NAME "cblas" GENERATOR "cblas.cmake")
 
+# ARM64 Windows: use pre-built OpenBLAS (DLL build) if OPENBLAS_ROOT is set
+if(WIN32 AND WITH_ARM AND NOT DEFINED CBLAS_PROVIDER AND DEFINED ENV{OPENBLAS_ROOT})
+  set(_OB_ROOT "$ENV{OPENBLAS_ROOT}")
+  if(EXISTS "${_OB_ROOT}/lib/openblas.lib" AND EXISTS "${_OB_ROOT}/include/openblas/cblas.h")
+    set(CBLAS_PROVIDER OPENBLAS CACHE STRING "cblas provider" FORCE)
+    set(CBLAS_INC_DIR "${_OB_ROOT}/include/openblas" CACHE PATH "openblas include" FORCE)
+    set(CBLAS_LIBRARIES "${_OB_ROOT}/lib/openblas.lib" CACHE FILEPATH "openblas lib" FORCE)
+    set(OPENBLAS_SHARED_LIB "${_OB_ROOT}/bin/openblas.dll" CACHE FILEPATH "openblas dll" FORCE)
+    add_definitions(-DPADDLE_USE_OPENBLAS)
+    add_definitions(-DLAPACK_FOUND)
+    message(STATUS "ARM64: Using pre-built OpenBLAS from ${_OB_ROOT}")
+  endif()
+endif()
+
 if(WITH_LIBXSMM)
   target_link_libraries(cblas ${LIBXSMM_LIBS})
   add_dependencies(cblas extern_libxsmm)
