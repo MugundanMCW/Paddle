@@ -15,7 +15,7 @@ permissions: read-all
 env:
   PR_ID: ${{ github.event.pull_request.number }}
   COMMIT_ID: ${{ github.event.pull_request.head.sha }}
-  BRANCH: ${{ github.base_ref }}
+  BRANCH: ${{ github.ref_name }}
   ci_scripts: ${{ github.workspace }}\ci\windows
   ACTION_DIR: ${{ github.workspace }}\..\..\..
   WORKSPACE_DIR: ${{ github.workspace }}\..
