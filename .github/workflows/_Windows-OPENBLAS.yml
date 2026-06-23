@@ -28,12 +28,6 @@ defaults:
     shell: cmd
 
 jobs:
-  check-bypass:
-    name: Check bypass
-    uses: ./.github/workflows/check-bypass.yml
-    with:
-      workflow-name: "win-openblas"
-      
   build-and-test:
     name: Build and test
     runs-on: windows-11-arm
