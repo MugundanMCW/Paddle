@@ -1,6 +1,8 @@
 name: Windows-arm64
 
 on:
+  push:
+    branches: win_Arm64
   workflow_call:
     inputs:
       clone-can-skip:
