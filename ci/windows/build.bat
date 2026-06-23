@@ -55,16 +55,15 @@ mkdir %BUILD_DIR%
 rem set vs language to english to block showIncludes, this need vs has installed English language package.
 set VSLANG=1033
 rem Configure the environment for 64-bit builds. 'DISTUTILS_USE_SDK' indicates that the user has selected the compiler.
-if not defined vcvars64_dir set "vcvars64_dir=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat" & echo vcvars64_dir=!vcvars64_dir!>> %GITHUB_ENV%
-echo %vcvars64_dir%
+if not defined vcvars64_dir set "vcvars64_dir=C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsarm64.bat"
 call "%vcvars64_dir%"
 
 set DISTUTILS_USE_SDK=1
 rem Windows 10 Kit bin dir
-set "PATH=C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64;%PATH%"
+set "PATH=C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\arm64;%PATH%"
 rem Use 64-bit ToolSet to compile
-set PreferredToolArchitecture=x64
-echo PreferredToolArchitecture=x64>>%GITHUB_ENV%
+set PreferredToolArchitecture=arm64
+echo PreferredToolArchitecture=arm64>>%GITHUB_ENV%
 
 for /f "usebackq" %%i in (`powershell -NoProfile -Command "Get-Date -Format 'yyyyMMddHHmmss'"`) do set start=%%i
 set start=%start:~4,10%
@@ -276,7 +275,7 @@ echo Build third_party the %build_times% time:
 if "%GENERATOR%" == "Ninja" (
     ninja third_party
 ) else (
-    MSBuild /m /p:PreferredToolArchitecture=x64 /p:Configuration=Release /verbosity:%LOG_LEVEL% third_party.vcxproj
+    MSBuild /m /p:PreferredToolArchitecture=arm64 /p:Configuration=Release /verbosity:%LOG_LEVEL% third_party.vcxproj
 )
 
 if %ERRORLEVEL% NEQ 0 (
