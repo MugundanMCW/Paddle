@@ -26,18 +26,21 @@
 
 generate_dummy_static_lib(LIB_NAME "cblas" GENERATOR "cblas.cmake")
 
-# ARM64 Windows: use pre-built OpenBLAS (DLL build) if OPENBLAS_ROOT is set
-if(WIN32 AND WITH_ARM AND NOT DEFINED CBLAS_PROVIDER AND DEFINED ENV{OPENBLAS_ROOT})
-  set(_OB_ROOT "$ENV{OPENBLAS_ROOT}")
-  if(EXISTS "${_OB_ROOT}/lib/openblas.lib" AND EXISTS "${_OB_ROOT}/include/openblas/cblas.h")
-    set(CBLAS_PROVIDER OPENBLAS CACHE STRING "cblas provider" FORCE)
-    set(CBLAS_INC_DIR "${_OB_ROOT}/include/openblas" CACHE PATH "openblas include" FORCE)
-    set(CBLAS_LIBRARIES "${_OB_ROOT}/lib/openblas.lib" CACHE FILEPATH "openblas lib" FORCE)
-    set(OPENBLAS_SHARED_LIB "${_OB_ROOT}/bin/openblas.dll" CACHE FILEPATH "openblas dll" FORCE)
-    add_definitions(-DPADDLE_USE_OPENBLAS)
-    add_definitions(-DLAPACK_FOUND)
-    message(STATUS "ARM64: Using pre-built OpenBLAS from ${_OB_ROOT}")
+# ARM64 Windows: use pre-built OpenBLAS if CBLAS_LIBRARIES points to a real file
+if(WIN32 AND WITH_ARM AND NOT DEFINED CBLAS_PROVIDER AND
+   DEFINED CBLAS_LIBRARIES AND EXISTS "${CBLAS_LIBRARIES}")
+  set(CBLAS_PROVIDER OPENBLAS CACHE STRING "cblas provider" FORCE)
+  # CBLAS_INC_DIR and CBLAS_LIBRARIES are already set from command line
+  # Derive DLL path from lib path: .../lib/openblas.lib -> .../bin/openblas.dll
+  if(NOT DEFINED OPENBLAS_SHARED_LIB OR NOT EXISTS "${OPENBLAS_SHARED_LIB}")
+    get_filename_component(_ob_libdir "${CBLAS_LIBRARIES}" DIRECTORY)
+    get_filename_component(_ob_root   "${_ob_libdir}"      DIRECTORY)
+    set(OPENBLAS_SHARED_LIB "${_ob_root}/bin/openblas.dll"
+        CACHE FILEPATH "openblas dll" FORCE)
   endif()
+  add_definitions(-DPADDLE_USE_OPENBLAS)
+  add_definitions(-DLAPACK_FOUND)
+  message(STATUS "ARM64: Using pre-built OpenBLAS: ${CBLAS_LIBRARIES}")
 endif()
 
 if(WITH_LIBXSMM)
