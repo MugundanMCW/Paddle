@@ -24,7 +24,7 @@ git config --global core.longpaths true
 git config --global user.name "PaddleCI"
 git config --global user.email "paddle_ci@example.com"
 
-git remote add upstream https://github.com/PaddlePaddle/Paddle.git
+git remote add upstream https://github.com/MugundanMCW/Paddle.git
 
 git --no-pager pull upstream %BRANCH% --no-edit
 if %errorlevel% NEQ 0 exit /b 1
