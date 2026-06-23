@@ -60,17 +60,16 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Download and extract OpenBLAS (ARM64 static)
+      - name: Download and extract OpenBLAS (ARM64 DLL)
         shell: pwsh
         run: |
-          $url = "https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.30/OpenBLAS-0.3.30-woa64-static.zip"
+          $url = "https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.30/OpenBLAS-0.3.30-woa64-dll.zip"
           $zip = "C:\openblas.zip"
           $dest = "C:\openblas_extract"
           Write-Host "Downloading OpenBLAS..."
           Invoke-WebRequest -Uri $url -OutFile $zip -UseBasicParsing
           Write-Host "Extracting..."
           Expand-Archive -Path $zip -DestinationPath $dest -Force
-          # The zip contains a top-level folder; move its contents to C:\openblas
           $inner = Get-ChildItem $dest | Select-Object -First 1
           Move-Item $inner.FullName "C:\openblas"
           Write-Host "OpenBLAS installed to C:\openblas"
