@@ -19,6 +19,10 @@ set(CBLAS_INSTALL_DIR ${THIRD_PARTY_PATH}/install/openblas)
 set(CBLAS_SOURCE_DIR ${PADDLE_SOURCE_DIR}/third_party/openblas)
 set(CBLAS_TAG v0.3.7)
 
+if(WIN32 AND WITH_ARM)
+  set(CBLAS_TAG v0.3.30)
+endif()
+
 if(UNIX
    AND NOT APPLE
    AND NOT WITH_ROCM
@@ -125,6 +129,7 @@ else()
                -DCMAKE_POSITION_INDEPENDENT_CODE=ON
                -DCMAKE_BUILD_TYPE=${THIRD_PARTY_BUILD_TYPE}
                -DBUILD_SHARED_LIBS=ON
+               -DBUILD_TESTING=OFF
                -DCMAKE_VERBOSE_MAKEFILE=OFF
                -DMSVC_STATIC_CRT=${MSVC_STATIC_CRT}
                ${OPENBLAS_POLICY_ARGS}
