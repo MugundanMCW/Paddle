@@ -27,7 +27,6 @@ jobs:
   build-and-test:
     name: Build and test
     runs-on: windows-11-arm
-    timeout-minutes: 120
     env:
       PADDLE_VERSION: 0.0.0
       NIGHTLY_MODE: "OFF"
