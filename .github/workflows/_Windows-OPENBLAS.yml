@@ -1,4 +1,4 @@
-name: Windows-GPU
+name: Windows-arm64
 
 on:
   workflow_call:
@@ -49,7 +49,7 @@ jobs:
       GIT_PR_ID: ${{ github.event.pull_request.number }}
       WITH_TESTING: "OFF"
       PRECISION_TEST: "OFF"
-      PYTHON_ROOT: C:\Python311
+      PYTHON_ROOT: C:\Python313
       CTEST_PARALLEL_LEVEL: 1
       GENERATOR: "Ninja"
       GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
