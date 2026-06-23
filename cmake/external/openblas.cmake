@@ -18,7 +18,20 @@ set(CBLAS_PREFIX_DIR ${THIRD_PARTY_PATH}/openblas)
 set(CBLAS_INSTALL_DIR ${THIRD_PARTY_PATH}/install/openblas)
 set(CBLAS_SOURCE_DIR ${PADDLE_SOURCE_DIR}/third_party/openblas)
 set(CBLAS_TAG v0.3.7)
-
+# ARM64 Windows pre-built: skip building, create no-op target
+if(WIN32 AND WITH_ARM AND DEFINED ENV{OPENBLAS_ROOT} AND
+   EXISTS "$ENV{OPENBLAS_ROOT}/lib/openblas.lib")
+  if(NOT TARGET extern_openblas)
+    add_custom_target(extern_openblas)
+  endif()
+  set(CBLAS_LIBRARIES "$ENV{OPENBLAS_ROOT}/lib/openblas.lib"
+      CACHE FILEPATH "openblas library." FORCE)
+  set(CBLAS_INC_DIR "$ENV{OPENBLAS_ROOT}/include/openblas"
+      CACHE PATH "openblas include directory." FORCE)
+  set(OPENBLAS_SHARED_LIB "$ENV{OPENBLAS_ROOT}/bin/openblas.dll"
+      CACHE FILEPATH "openblas shared lib." FORCE)
+  return()
+endif()
 
 
 if(WIN32 AND WITH_ARM)
