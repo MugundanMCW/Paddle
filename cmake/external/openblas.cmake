@@ -19,6 +19,8 @@ set(CBLAS_INSTALL_DIR ${THIRD_PARTY_PATH}/install/openblas)
 set(CBLAS_SOURCE_DIR ${PADDLE_SOURCE_DIR}/third_party/openblas)
 set(CBLAS_TAG v0.3.7)
 
+
+
 if(WIN32 AND WITH_ARM)
   set(CBLAS_TAG v0.3.30)
 endif()
@@ -40,6 +42,15 @@ endif()
 
 if(WITH_LOONGARCH)
   set(CBLAS_TAG v0.3.18)
+endif()
+
+# ARM64 Windows pre-built: skip building, create no-op target
+if(WIN32 AND WITH_ARM AND DEFINED ENV{OPENBLAS_ROOT} AND
+   EXISTS "$ENV{OPENBLAS_ROOT}/lib/openblas.lib")
+  if(NOT TARGET extern_openblas)
+    add_custom_target(extern_openblas)
+  endif()
+  return()
 endif()
 
 # For CMake >= 4.0.0, set policy compatibility for OpenBLAS's CMake.
