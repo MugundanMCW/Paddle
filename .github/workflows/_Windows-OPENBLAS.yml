@@ -57,14 +57,15 @@ jobs:
       WIN_UNITTEST_LEVEL: 2
       CUDA_ARCH_NAME: "Auto"
     steps:
-      - name: Config env
-        run: |
-          call %ci_scripts%\config_env.bat
-
       - name: Checkout Paddle
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
+      - name: Config env
+        run: |
+          call %ci_scripts%\config_env.bat
+
+
 
       - name: Build paddle
         run: |
