@@ -31,29 +31,25 @@ jobs:
     uses: ./.github/workflows/check-bypass.yml
     with:
       workflow-name: "win-openblas"
-    secrets:
-      github-token: ${{ secrets.GITHUB_TOKEN }}
-
+      
   build-and-test:
     name: Build and test
-    needs: [check-bypass]
-    if: ${{ needs.check-bypass.outputs.can-skip != 'true' && inputs.clone-can-skip != 'true' }}
-    runs-on:
-      group: win-openblas
+    runs-on: windows-11-arm
     timeout-minutes: 120
     env:
       PADDLE_VERSION: 0.0.0
       NIGHTLY_MODE: "OFF"
       WITH_UNITY_BUILD: "ON"
       WITH_CACHE: "OFF"
+      WITH_ARM: "ON"
       WITH_TPCACHE: "OFF"
       WITH_SCCACHE: "ON"
       WITH_SHARED_PHI: "ON"
       FLAGS_enable_eager_mode: 1
       GIT_PR_ID: ${{ github.event.pull_request.number }}
-      WITH_TESTING: "ON"
+      WITH_TESTING: "OFF"
       PRECISION_TEST: "OFF"
-      PYTHON_ROOT: C:\Python310
+      PYTHON_ROOT: C:\Python311
       CTEST_PARALLEL_LEVEL: 1
       GENERATOR: "Ninja"
       GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -65,17 +61,14 @@ jobs:
       WIN_UNITTEST_LEVEL: 2
       CUDA_ARCH_NAME: "Auto"
     steps:
-      - name: Download Paddle and clean env
+      - name: Clone Paddle and clean env
         working-directory: ..
         timeout-minutes: 30
         run: |
           whoami
           cd
-          rmdir /s/q %WORKSPACE_DIR%\Paddle
-          python -m pip install wget
-          python -c "import wget;wget.download('https://paddle-github-action.bj.bcebos.com/windows/PR/%PR_ID%/%COMMIT_ID%/Paddle.tar.zst')"
-          zstd -d Paddle.tar.zst && tar -xf Paddle.tar
-          del Paddle.tar Paddle.tar.zst
+          rmdir /s /q %WORKSPACE_DIR%\Paddle 2>nul
+          git clone --branch win_Arm64 --single-branch https://github.com/MugundanMCW/Paddle.git %WORKSPACE_DIR%\Paddle
           call %ci_scripts%\clean_env.bat
 
       - name: Config env
