@@ -1,5 +1,4 @@
 name: Windows-arm64
-
 on:
   push:
     branches: win_Arm64
@@ -9,9 +8,7 @@ on:
         type: string
         required: false
         default: "false"
-
 permissions: read-all
-
 env:
   PR_ID: ${{ github.event.pull_request.number }}
   COMMIT_ID: ${{ github.event.pull_request.head.sha }}
@@ -21,12 +18,11 @@ env:
   WORKSPACE_DIR: ${{ github.workspace }}\..
   cache_dir: C:\action-cache
   SCCACHE_ROOT: C:\sccache
+  OPENBLAS_ROOT: C:\openblas
   no_proxy: "bcebos.com,apiin.im.baidu.com,gitee.com,aliyun.com,.baidu.com,.tuna.tsinghua.edu.cn"
-
 defaults:
   run:
     shell: cmd
-
 jobs:
   build-and-test:
     name: Build and test
@@ -55,18 +51,37 @@ jobs:
       ON_INFER: "ON"
       WIN_UNITTEST_LEVEL: 2
       CUDA_ARCH_NAME: "Auto"
+      CBLAS_PROVIDER: "OPENBLAS"
+      CBLAS_INC_DIR: C:\openblas\include\openblas
+      CBLAS_LIBRARIES: C:\openblas\lib\openblas.lib
     steps:
       - name: Checkout Paddle
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
+      - name: Download and extract OpenBLAS (ARM64 static)
+        shell: pwsh
+        run: |
+          $url = "https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.30/OpenBLAS-0.3.30-woa64-static.zip"
+          $zip = "C:\openblas.zip"
+          $dest = "C:\openblas_extract"
+          Write-Host "Downloading OpenBLAS..."
+          Invoke-WebRequest -Uri $url -OutFile $zip -UseBasicParsing
+          Write-Host "Extracting..."
+          Expand-Archive -Path $zip -DestinationPath $dest -Force
+          # The zip contains a top-level folder; move its contents to C:\openblas
+          $inner = Get-ChildItem $dest | Select-Object -First 1
+          Move-Item $inner.FullName "C:\openblas"
+          Write-Host "OpenBLAS installed to C:\openblas"
+          Get-ChildItem "C:\openblas" -Recurse | Select-Object FullName
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
           architecture: arm64
-      
+
       - name: Set PYTHON_ROOT
         run: |
           for /f "delims=" %%i in ('where python.exe') do (
@@ -74,11 +89,10 @@ jobs:
           )
           if "%PY_PATH:~-1%"=="\" set "PY_PATH=%PY_PATH:~0,-1%"
           echo PYTHON_ROOT=%PY_PATH%>> %GITHUB_ENV%
+
       - name: Config env
         run: |
           call %ci_scripts%\config_env.bat
-
-
 
       - name: Build paddle
         run: |
