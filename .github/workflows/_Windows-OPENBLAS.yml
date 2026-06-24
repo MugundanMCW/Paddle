@@ -83,11 +83,12 @@ jobs:
       - name: Set Python paths
         shell: cmd
         run: |
-          for /f "delims=" %%i in ('where python.exe') do (
-            if not defined PY_PATH set "PY_PATH=%%~dpi"
-          )
-          if "%PY_PATH:~-1%"=="\" set "PY_PATH=%PY_PATH:~0,-1%"
-          echo PYTHON_ROOT=%PY_PATH%>> %GITHUB_ENV%
+          echo PYTHON_ROOT=%pythonLocation%>> %GITHUB_ENV%
+
+      - name: Install Python build dependencies
+        shell: cmd
+        run: |
+          "%pythonLocation%\python.exe" -m pip install numpy protobuf wheel
 
       - name: Config env
         run: |
