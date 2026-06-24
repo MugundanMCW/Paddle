@@ -89,6 +89,7 @@ jobs:
         shell: cmd
         run: |
           "%pythonLocation%\python.exe" -m pip install numpy protobuf wheel
+          "%pythonLocation%\python.exe" -m pip install -r python\requirements.txt
 
       - name: Config env
         run: |
