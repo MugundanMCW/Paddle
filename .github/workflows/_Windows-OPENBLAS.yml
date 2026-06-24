@@ -74,13 +74,14 @@ jobs:
           Write-Host "OpenBLAS installed to C:\openblas"
           Get-ChildItem "C:\openblas" -Recurse | Select-Object FullName
 
-      - name: Set up Python
+      - name: Setup Python 3.11 ARM64
         uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
-          architecture: arm64
+          python-version: '3.11'
+          architecture: 'arm64'
 
-      - name: Set PYTHON_ROOT
+      - name: Set Python paths
+        shell: cmd
         run: |
           for /f "delims=" %%i in ('where python.exe') do (
             if not defined PY_PATH set "PY_PATH=%%~dpi"
